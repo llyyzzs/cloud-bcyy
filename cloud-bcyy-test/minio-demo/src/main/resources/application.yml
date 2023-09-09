@@ -1,0 +1,6 @@
+minio:
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucket: bcyy
+  endpoint: http://192.168.11.129:9000
+  readPath: http://192.168.11.129:9000

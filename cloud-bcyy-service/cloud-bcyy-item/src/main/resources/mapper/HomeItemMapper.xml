@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bcyy.item.mapper.HomeItemMapper">
+
+    <resultMap id="resultMap" type="com.bcyy.model.item.pojos.HomeItem" autoMapping="true">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="price" property="price"/>
+        <result column="tags" property="tags"/>
+        <result column="image" property="image"/>
+        <result column="hr_name" property="HRname"/>
+        <result column="type" property="type"/>
+        <result column="label" property="label"  typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"  />
+        <result column="itemCompanyDvo" property="itemCompanyDvo" typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"   />
+    </resultMap>
+    <select id="screenList" resultType="com.bcyy.model.item.pojos.HomeItem" resultMap="resultMap">
+        SELECT
+        aa.*
+        FROM home_item aa
+        LEFT JOIN details_item bb on aa.id = bb.id
+        <where>
+            <if test="screenDto.tags !=null">
+                and aa.tags like CONCAT('%', #{screenDto.tags}, '%')
+            </if>
+            <if test="screenDto.price != null">
+                and aa.price >= #{screenDto.price}
+            </if>
+            <if test="screenDto.type !=null">
+                and aa.type=#{screenDto.type}
+            </if>
+            <if test="screenDto.experience !=null">
+                and bb.experience >=#{screenDto.experience}
+            </if>
+            <if test="screenDto.degree !=null">
+                and bb.degree like CONCAT('%', #{screenDto.degree}, '%')
+            </if>
+            <if test="screenDto.name !=null">
+                and aa.itemCompanyDvo like CONCAT('%"name": "', #{screenDto.name}, '"%')
+            </if>
+            <if test="screenDto.city !=null">
+                and aa.itemCompanyDvo like CONCAT('%', #{screenDto.city}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>

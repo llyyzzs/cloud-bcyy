@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-basic/cloud-bcyy-file-starter/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-basic/cloud-bcyy-file-starter/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-basic/cloud-bcyy-starter/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-basic/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-basic/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-feign-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-feign-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-gateway/cloud-bcyy-app-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-model/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-model/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-admin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-chat/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-company/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-item/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-search/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-search/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-search2/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-websocket/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-websocket/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-test/minio-demo/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-test/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-test/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-utils/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-utils/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-bcyy-webSocket/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

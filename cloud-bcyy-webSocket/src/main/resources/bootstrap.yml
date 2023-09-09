@@ -1,0 +1,12 @@
+server:
+  port: 51808
+spring:
+  application:
+    name: bcyy-webSocket
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.11.129:8848
+      config:
+        server-addr: 192.168.11.129:8848
+        file-extension: yml

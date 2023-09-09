@@ -1,0 +1,12 @@
+server:
+  port: 51800
+spring:
+  application:
+    name: bcyy-admin
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.11.129:8848
+      config:
+        server-addr: 192.168.11.129:8848
+        file-extension: yml

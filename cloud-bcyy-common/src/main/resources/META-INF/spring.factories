@@ -1,0 +1,10 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.bcyy.common.exception.ExceptionCatch,\
+  com.bcyy.common.aliyun.GreenImageScan,\
+  com.bcyy.common.aliyun.GreenTextScan,\
+  com.bcyy.common.tess4j.Tess4jClient,\
+  com.bcyy.common.redis.CacheService,\
+  com.bcyy.common.jackson.InitJacksonConfig,\
+  com.bcyy.common.swagger.SwaggerConfiguration,\
+  com.bcyy.common.sentinel.HeaderOriginParser,\
+  com.bcyy.common.sentinel.SentinelExceptionHandler
