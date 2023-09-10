@@ -5,8 +5,6 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-user/pom.xml" />
-        <option value="$PROJECT_DIR$/cloud-bcyy-service/cloud-bcyy-search/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
