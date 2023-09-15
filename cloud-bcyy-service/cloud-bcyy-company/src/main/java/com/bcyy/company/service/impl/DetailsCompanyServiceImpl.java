@@ -101,7 +101,6 @@ public class DetailsCompanyServiceImpl extends ServiceImpl<DetailsCompanyMapper,
             user.setCompanyId(id);
             UserUp userUp = new UserUp();
             BeanUtils.copyProperties(user,userUp);
-//            rabbitTemplate.convertAndSend("bcyy_company","upUser",userUp);
             CompanyDvo companyDvo = new CompanyDvo();
             BeanUtils.copyProperties(homeCompany,companyDvo);
             BeanUtils.copyProperties(detailsCompany,companyDvo);
@@ -114,9 +113,14 @@ public class DetailsCompanyServiceImpl extends ServiceImpl<DetailsCompanyMapper,
                     .eq("id",detailsCompany.getId()));
             homeCompanyMapper.update(homeCompany,new QueryWrapper<HomeCompany>()
                     .eq("id",homeCompany.getId()));
+            DetailsCompany detailsCompany2 = detailsCompanyMapper.selectById(homeCompany.getId());
+            HomeCompany homeCompany2 = homeCompanyMapper.selectById(homeCompany.getId());
+            CompanyDvo companyDvo = new CompanyDvo();
+            BeanUtils.copyProperties(homeCompany2,companyDvo);
+            BeanUtils.copyProperties(detailsCompany2,companyDvo);
             cacheService.delete("DetailCompany_" + companyDto.getCompanyId());
             rabbitTemplate.convertAndSend("company.topic","company.delete",homeCompany.getId());
-            rabbitTemplate.convertAndSend("company.topic","company.insert",homeCompany);
+            rabbitTemplate.convertAndSend("company.topic","company.insert",companyDvo);
         }
         return ResponseResult.okResult(200,"操作成功");
     }
