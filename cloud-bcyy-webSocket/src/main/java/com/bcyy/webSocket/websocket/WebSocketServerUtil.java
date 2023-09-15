@@ -73,7 +73,7 @@ public class WebSocketServerUtil {
             webSocketMap.get(uId).sendMessage(message);
         }else{
             log.error("用户"+uId+",不在线！");
-            throw new Exception("连接已关闭，请刷新页面后重试");
+            throw new Exception("连接已关闭，请重试");
         }
     }
 }
