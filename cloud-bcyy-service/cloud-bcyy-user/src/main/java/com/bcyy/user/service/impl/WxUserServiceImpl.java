@@ -134,6 +134,7 @@ public class WxUserServiceImpl extends ServiceImpl<WxUserMapper, WxUser> impleme
         wxUserMapper.update(user, new QueryWrapper<WxUser>().eq("openid", openId));
         //4.返回结果
         cacheService.delete("user_" + openId);
+        cacheService.append("images::"+openId,fileUrl);
         return ResponseResult.okResult(fileUrl);
     }
 

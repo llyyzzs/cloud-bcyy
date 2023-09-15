@@ -16,7 +16,7 @@ import java.util.List;
 
 @FeignClient(value = "bcyy-user",configuration = FeignConfig.class)
 public interface WxUserApi {
-    @GetMapping("/user/getuser")
+    @GetMapping("/user/get/user")
     ResponseResult getuser(@RequestParam("openid")String openid);
     @PostMapping("/user/update")
     ResponseResult update(@RequestBody UserUp user);
