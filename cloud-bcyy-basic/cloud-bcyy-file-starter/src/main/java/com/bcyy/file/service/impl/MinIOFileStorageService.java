@@ -163,6 +163,7 @@ public class MinIOFileStorageService implements FileStorageService {
         }
         return byteArrayOutputStream.toByteArray();
     }
+    //获取文件路径
     public String fileUrl(MultipartFile multipartFile){
         //1.检查参数
         if (multipartFile == null || multipartFile.getSize() == 0) {
