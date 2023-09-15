@@ -10,9 +10,9 @@ import java.util.Date;
 @TableName(value = "chat_room",autoResultMap = true)
 public class ChatRoom {
     private String id;
-    private String name;
     private String description;
     @TableField(value = "created_at")
     private Date created;
     private Integer count;
+    private Integer type;
 }

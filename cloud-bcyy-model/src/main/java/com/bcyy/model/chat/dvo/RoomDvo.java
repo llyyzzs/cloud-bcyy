@@ -1,15 +1,15 @@
-package com.bcyy.model.chat.dto;
+package com.bcyy.model.chat.dvo;
 
 import lombok.Data;
 
 import java.util.Date;
-
 @Data
-public class UpRoom {
-    private String roomId;
+public class RoomDvo {
+    private String id;
     private String name;
     private String description;
-    private Integer count;
     private Date created;
+    private Integer count;
+    private String avatar;
     private Integer type;
 }

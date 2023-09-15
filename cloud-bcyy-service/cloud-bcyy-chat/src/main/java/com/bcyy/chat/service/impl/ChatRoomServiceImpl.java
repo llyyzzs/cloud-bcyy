@@ -7,7 +7,9 @@ import com.bcyy.apis.item.DetailsItemApi;
 import com.bcyy.apis.user.WxUserApi;
 import com.bcyy.chat.mapper.ChatRoomMapper;
 import com.bcyy.chat.service.ChatRoomService;
+import com.bcyy.model.chat.dto.DeleteRoom;
 import com.bcyy.model.chat.dto.UpRoom;
+import com.bcyy.model.chat.dvo.RoomDvo;
 import com.bcyy.model.chat.pojos.ChatRoom;
 import com.bcyy.model.common.dtos.ResponseResult;
 import com.bcyy.model.item.vos.ItemDvo;
@@ -29,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -50,7 +53,7 @@ public class ChatRoomServiceImpl extends ServiceImpl<ChatRoomMapper, ChatRoom> i
     public ResponseResult addRoom(String itemId){
         String id = UUID.randomUUID().toString();
         ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setCreated( new Date());
+        chatRoom.setCreated(new Date());
         chatRoom.setId(id);
         chatRoom.setCount(0);
         chatRoomMapper.insert(chatRoom);
@@ -63,8 +66,8 @@ public class ChatRoomServiceImpl extends ServiceImpl<ChatRoomMapper, ChatRoom> i
         weChat.setRoomId(id);
         weChat.setName(itemDvo.getHRname());
         weChat.setItemId(itemId);
-//        rabbitTemplate.convertAndSend("bcyy_chat","user",weChat);
-        wxUserApi.addCommunicate(weChat);
+        rabbitTemplate.convertAndSend("user.topic","addCommunicate",weChat);
+//        wxUserApi.addCommunicate(weChat);
         return ResponseResult.okResult(id);
 
     }
@@ -91,8 +94,8 @@ public class ChatRoomServiceImpl extends ServiceImpl<ChatRoomMapper, ChatRoom> i
         if (upRoom.getDescription() != null) {
             chatRoom.setDescription(upRoom.getDescription());
         }
-        if (upRoom.getName() != null) {
-            chatRoom.setName(upRoom.getName());
+        if (upRoom.getType() != null) {
+            chatRoom.setType(upRoom.getType());
         }
         chatRoomMapper.update(chatRoom,new QueryWrapper<ChatRoom>()
                 .eq("id",upRoom.getRoomId()));
@@ -102,7 +105,12 @@ public class ChatRoomServiceImpl extends ServiceImpl<ChatRoomMapper, ChatRoom> i
      * 删除聊天室
      * */
     public ResponseResult delete(String id){
+        String openid = AppThreadLocalUtil.getUser().getOpenid();
+        DeleteRoom deleteRoom = new DeleteRoom();
+        deleteRoom.setId(id);
+        deleteRoom.setOpenid(openid);
         chatRoomMapper.deleteById(id);
+        rabbitTemplate.convertAndSend("user.topic","deleteCommunicate",deleteRoom);
         return ResponseResult.errorResult(200,"删除成功");
     }
     /**
@@ -110,11 +118,14 @@ public class ChatRoomServiceImpl extends ServiceImpl<ChatRoomMapper, ChatRoom> i
      * */
     public ResponseResult getRoom(){
         HashSet<MyChat> communicate = wxUserApi.getCommunicate();
-        HashSet<ChatRoom> roomList = new HashSet<>();
+        HashSet<RoomDvo> roomList = new HashSet<>();
         for (MyChat myChat:communicate) {
             ChatRoom chatRoom = chatRoomMapper.selectById(myChat.getRoomId());
-            chatRoom.setName(myChat.getName());
-            roomList.add(chatRoom);
+            RoomDvo roomDvo = new RoomDvo();
+            BeanUtils.copyProperties(chatRoom,roomDvo);
+            roomDvo.setName(myChat.getName());
+            roomDvo.setAvatar(myChat.getAvatar());
+            roomList.add(roomDvo);
         }
         return ResponseResult.okResult(roomList);
     }

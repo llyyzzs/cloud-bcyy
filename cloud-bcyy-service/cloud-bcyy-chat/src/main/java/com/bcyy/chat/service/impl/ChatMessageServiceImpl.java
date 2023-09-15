@@ -50,6 +50,7 @@ public class ChatMessageServiceImpl extends ServiceImpl<ChatMessageMapper, ChatM
         upRoom.setRoomId(sendMessage.getChatRoomId());
         upRoom.setDescription(sendMessage.getContent());
         upRoom.setCreated(new Date());
+        upRoom.setType(sendMessage.getType());
 //        rabbitTemplate.convertAndSend("bcyy_chat","room",upRoom);
         chatRoomService.upRoom(upRoom);
         return ResponseResult.okResult(200,"发送成功");
