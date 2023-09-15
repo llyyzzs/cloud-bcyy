@@ -7,6 +7,8 @@ import lombok.Data;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.TreeSet;
 
 @Data
 @TableName(value = "collect",autoResultMap = true)
@@ -16,7 +18,7 @@ public class Collect {
     @TableField(value = "collect",typeHandler = JacksonTypeHandler.class)
     private HashSet<String> collect;
     @TableField(value = "communicate",typeHandler = JacksonTypeHandler.class)
-    private HashSet<MyChat> communicate;
+    private HashSet<String> communicate;
     @TableField(value = "deliver",typeHandler = JacksonTypeHandler.class)
     private HashMap<String,Integer> deliver;
 }

@@ -32,8 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -68,7 +67,7 @@ public class WxUserServiceImpl extends ServiceImpl<WxUserMapper, WxUser> impleme
             user2.setOpenid(openid);
             wxUserMapper.insert(user2);
             HashSet<String> hashSet = new HashSet<>();
-            HashSet<MyChat> hashSet1 = new HashSet<>();
+            HashSet<String> hashSet1 = new HashSet<>();
             HashMap<String, Integer> hashMap = new HashMap<>();
             Collect collect = new Collect();
             collect.setOpenid(openid);
@@ -123,13 +122,18 @@ public class WxUserServiceImpl extends ServiceImpl<WxUserMapper, WxUser> impleme
         String avatar = wxUserMapper.selectOne(new QueryWrapper<WxUser>().eq("openid", openId)).getAvatar();
         //删除之前的图片
         if (avatar != null && !avatar.equals("null")) {
-            fileStorageService.delete(avatar);
+            try {
+                fileStorageService.delete(avatar);
+            } catch (Exception e) {
+                log.info("删除图片失败");
+            }
         }
         //3.保存到数据库中
         WxUser user = new WxUser();
         user.setAvatar(fileUrl);
         wxUserMapper.update(user, new QueryWrapper<WxUser>().eq("openid", openId));
         //4.返回结果
+        cacheService.delete("user_" + openId);
         return ResponseResult.okResult(fileUrl);
     }
 

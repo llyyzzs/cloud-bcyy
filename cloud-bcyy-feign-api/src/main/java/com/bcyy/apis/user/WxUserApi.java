@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashSet;
+import java.util.List;
 
 @FeignClient(value = "bcyy-user",configuration = FeignConfig.class)
 public interface WxUserApi {
@@ -21,6 +22,6 @@ public interface WxUserApi {
     ResponseResult update(@RequestBody UserUp user);
     @GetMapping("/user/getCommunicate")
     HashSet<MyChat> getCommunicate();
-    @PostMapping("/user/addCommunicate")
-    ResponseResult addCommunicate(@RequestBody WeChat weChat);
+//    @PostMapping("/user/addCommunicate")
+//    ResponseResult addCommunicate(@RequestBody WeChat weChat);
 }

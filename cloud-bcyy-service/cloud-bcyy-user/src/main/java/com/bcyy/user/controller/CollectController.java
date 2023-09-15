@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.TreeSet;
 
 @RestController
 @RequestMapping("/user")
@@ -38,17 +40,17 @@ public class CollectController {
         return  collectService.getCollect();
     }
 
-    @ApiOperation("添加沟通")
-    @PostMapping("/addCommunicate")
-    public ResponseResult addCommunicate(@RequestBody WeChat weChat){
-        return  collectService.addCommunicate(weChat);
+    @ApiOperation("获取某个招聘的收藏状态")
+    @GetMapping("/getCollectOne")
+    public ResponseResult getCollectOne(String itemId){
+        return collectService.getCollectOne(itemId);
     }
+//    @ApiOperation("添加沟通")
+//    @PostMapping("/addCommunicate")
+//    public ResponseResult addCommunicate(@RequestBody WeChat weChat){
+//        return  collectService.addCommunicate(weChat);
+//    }
 
-    @ApiOperation("取消沟通")
-    @GetMapping("/deleteCommunicate")
-    public ResponseResult deleteCommunicate(@RequestParam("id") String id){
-        return  collectService.deleteCommunicate(id);
-    }
 
     @ApiOperation("获取沟通")
     @GetMapping("/getCommunicate")

@@ -3,17 +3,22 @@ package com.bcyy.user.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.bcyy.apis.chat.ChatRoomApi;
 import com.bcyy.apis.item.DetailsItemApi;
 import com.bcyy.apis.webSocket.WebSocketApi;
+import com.bcyy.common.redis.CacheService;
 import com.bcyy.file.service.FileStorageService;
+import com.bcyy.model.chat.dto.DeleteRoom;
 import com.bcyy.model.chat.dto.SendMessage;
 import com.bcyy.model.common.dtos.ResponseResult;
+import com.bcyy.model.item.pojos.HomeItem;
 import com.bcyy.model.item.vos.ItemDvo;
 import com.bcyy.model.user.dtos.WeChat;
 import com.bcyy.model.user.pojos.Collect;
 import com.bcyy.model.user.pojos.MyChat;
 import com.bcyy.user.mapper.CollectMapper;
 import com.bcyy.user.service.CollectService;
+import com.bcyy.user.service.WxUserService;
 import com.bcyy.utils.thread.AppThreadLocalUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.ExchangeTypes;
@@ -25,8 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.HashMap;
-import java.util.HashSet;
+
+import java.util.*;
 
 @Slf4j
 @Service
@@ -40,6 +45,12 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>imple
     WebSocketApi webSocketApi;
     @Autowired
     FileStorageService fileStorageService;
+    @Autowired
+    CacheService cacheService;
+    @Autowired
+    WxUserServiceImpl wxUserService;
+    @Autowired
+    ChatRoomApi chatRoomApi;
     /*
     * 添加收藏
     * */
@@ -49,6 +60,7 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>imple
         collect.getCollect().add(id);
         collect.setCollect(collect.getCollect());
         collectMapper.update(collect,new QueryWrapper<Collect>().eq("openid",openid));
+        cacheService.append(openid+"_"+id,"1");
         return ResponseResult.okResult(200,"添加成功");
     }
     /*
@@ -64,6 +76,7 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>imple
         }
         collect.setCollect(collect.getCollect());
         collectMapper.update(collect,new QueryWrapper<Collect>().eq("openid",openid));
+        cacheService.delete(openid+"_"+id);
         return ResponseResult.okResult(200,"取消成功");
     }
     /*
@@ -73,52 +86,79 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>imple
         String openid = AppThreadLocalUtil.getUser().getOpenid();
         Collect collect = collectMapper.selectOne(new QueryWrapper<Collect>().eq("openid",openid));
         HashSet<String> list = collect.getCollect();
-        HashSet<Object> objects = new HashSet<>();
+        HashSet<HomeItem> listItemDvo = new HashSet<>();
         for (String itemId:list) {
-            objects.add(detailsItemApi.getDetails(itemId).getData());
+            Object data = detailsItemApi.getItem(itemId).getData();
+            String s = JSON.toJSONString(data);
+            HomeItem homeItem = JSON.parseObject(s, HomeItem.class);
+            listItemDvo.add(homeItem);
         }
-        return  ResponseResult.okResult(objects);
+        return  ResponseResult.okResult(listItemDvo);
     }
-
+    //获取一个收藏
+    public ResponseResult getCollectOne(String itemId){
+        String openid = AppThreadLocalUtil.getUser().getOpenid();
+        String s = cacheService.get(openid + "_" + itemId);
+        if (s!=null){
+            return ResponseResult.okResult(true);
+        }else {
+            return ResponseResult.okResult(false);
+        }
+    }
     /*
     * 添加沟通
     * */
-//    @RabbitListener(bindings = @QueueBinding(
-//            value = @Queue(name = "communicate"),
-//            exchange = @Exchange(name = "bcyy_chat",type = ExchangeTypes.DIRECT),
-//            key = "user"
-//    ))
-    public ResponseResult addCommunicate(WeChat weChat){
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "communicate.insert"),
+            exchange = @Exchange(value = "user.topic"),
+            key = "addCommunicate"
+    ))
+    public void addCommunicate(WeChat weChat){
 //        String openid = AppThreadLocalUtil.getUser().getOpenid();
+        String myAvatar = wxUserService.getUser(weChat.getOpenid()).getAvatar();
+        String hrAvatar = wxUserService.getUser(weChat.getHrId()).getAvatar();
         Collect collect = collectMapper.selectOne(new QueryWrapper<Collect>().eq("openid",weChat.getOpenid()));
         Collect collectHR = collectMapper.selectOne(new QueryWrapper<Collect>().eq("openid", weChat.getHrId()));
         MyChat myChat = new MyChat();
         myChat.setItemId(weChat.getItemId());
         myChat.setRoomId(weChat.getRoomId());
         myChat.setName(weChat.getName());
+        myChat.setAvatar(hrAvatar);
         //分别为HR和应聘者添加聊天室
-        collect.getCommunicate().add(myChat);
-        collectHR.getCommunicate().add(myChat);
-        collect.setCommunicate(collect.getCommunicate());
+        HashSet<String> communicate = collect.getCommunicate();
+        communicate.add(JSON.toJSONString(myChat));
+        myChat.setAvatar(myAvatar);
+        collectHR.getCommunicate().add(JSON.toJSONString(myChat));
+        collect.setCommunicate(communicate);
         collectHR.setCommunicate(collectHR.getCommunicate());
         collectMapper.update(collect,new QueryWrapper<Collect>().eq("openid",weChat.getOpenid()));
         collectMapper.update(collectHR,new QueryWrapper<Collect>().eq("openid",weChat.getHrId()));
-        return ResponseResult.okResult(200,"添加成功");
     }
     /*
      * 取消沟通
      * */
-    public ResponseResult deleteCommunicate(String id){
-        String openid = AppThreadLocalUtil.getUser().getOpenid();
-        Collect collect = collectMapper.selectOne(new QueryWrapper<Collect>().eq("openid",openid));
-        if (id == null) {
-            collect.getCommunicate().clear();
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "communicate.delete"),
+            exchange = @Exchange(value = "user.topic"),
+            key = "deleteCommunicate"
+    ))
+    public void deleteCommunicate(DeleteRoom deleteRoom){
+        Collect collect = collectMapper.selectOne(new QueryWrapper<Collect>().eq("openid",deleteRoom.getOpenid()));
+        HashSet<String> communicate = collect.getCommunicate();
+        if (deleteRoom.getId() == null) {
+            communicate.clear();
         }else {
-            collect.getCommunicate().remove(id);
+            for (String s:communicate) {
+                MyChat myChat = JSON.parseObject(s, MyChat.class);
+                if (myChat.getRoomId().equals(deleteRoom.getId())){
+                    communicate.remove(s);
+                    break;
+                }
+            }
         }
-        collect.setCommunicate(collect.getCommunicate());
-        collectMapper.update(collect,new QueryWrapper<Collect>().eq("openid",openid));
-        return ResponseResult.okResult(200,"取消成功");
+        collect.setCommunicate(communicate);
+        collectMapper.update(collect,new QueryWrapper<Collect>().eq("openid",deleteRoom.getOpenid()));
     }
 
     /*
@@ -127,8 +167,13 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>imple
     public HashSet<MyChat>  getCommunicate(){
         String openid = AppThreadLocalUtil.getUser().getOpenid();
         Collect collect = collectMapper.selectOne(new QueryWrapper<Collect>().eq("openid",openid));
-        HashSet<MyChat> list = collect.getCommunicate();
-        return list;
+        HashSet<String> list = collect.getCommunicate();
+        HashSet<MyChat> myChats = new HashSet<>();
+        for (String s:list) {
+            MyChat myChat = JSON.parseObject(s, MyChat.class);
+            myChats.add(myChat);
+        }
+        return myChats;
     }
     /*
     * 添加投递
@@ -145,22 +190,19 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>imple
         ItemDvo itemDvo = JSON.parseObject(s, ItemDvo.class);
         String hrId = itemDvo.getHrId();
         String fileUrl = fileStorageService.fileUrl(multipartFile);
-        HashSet<MyChat> communicate = collect.getCommunicate();
+        HashSet<String> communicate = collect.getCommunicate();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setType(1);
         sendMessage.setContent(fileUrl);
         sendMessage.setSenderId(openid);
         sendMessage.setReceiverId(hrId);
-        for (MyChat myChat:communicate) {
-            if(myChat.getItemId()==itemId){
+        for (String s1:communicate) {
+            MyChat myChat = JSON.parseObject(s1, MyChat.class);
+            if(myChat.getItemId().equals(itemId)){
                 sendMessage.setChatRoomId(myChat.getRoomId());
             }
         }
-        try {
-            webSocketApi.push(JSON.toJSONString(sendMessage), hrId);
-        } catch (Exception e) {
-            log.info("没有该用户");
-        }
+        chatRoomApi.send(sendMessage);
         return ResponseResult.okResult(200,"添加成功");
     }
     /*
