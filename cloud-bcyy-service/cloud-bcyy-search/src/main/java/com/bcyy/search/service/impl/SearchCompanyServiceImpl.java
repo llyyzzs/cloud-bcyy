@@ -1,12 +1,12 @@
 package com.bcyy.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.bcyy.apis.company.DetailCompanyApi;
 import com.bcyy.model.common.dtos.ResponseResult;
-import com.bcyy.model.item.dtos.Position;
-import com.bcyy.model.item.pojos.HomeItem;
+import com.bcyy.model.company.dvo.CompanyDvo;
 import com.bcyy.model.search.dtos.RequestParams;
-import com.bcyy.model.search.vos.ItemSearch;
-import com.bcyy.search.service.SearchItemService;
+import com.bcyy.model.search.vos.CompanySearch;
+import com.bcyy.search.service.SearchCompanyService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -25,7 +25,6 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.elasticsearch.search.suggest.Suggest;
@@ -48,18 +47,20 @@ import java.util.List;
 @Service
 @Slf4j
 @Transactional
-public class SearchItemServiceImpl implements SearchItemService {
+public class SearchCompanyServiceImpl implements SearchCompanyService {
     @Autowired
     RestHighLevelClient client;
 //    @Autowired
-//    SearchItemMapper searchItemMapper;
+//    SearchCompanyMapper searchCompanyMapper;
+    @Autowired
+    DetailCompanyApi detailCompanyApi;
     /**
      * 搜索
      */
     @Override
     public ResponseResult search(RequestParams params) {
         try {
-            SearchRequest searchRequest = new SearchRequest("bcyy_item");
+            SearchRequest searchRequest = new SearchRequest("bcyy_company");
             buildBasicQuery(params,searchRequest);
             if (params.getPage() == null) {
                 params.setPage(1);
@@ -73,15 +74,16 @@ public class SearchItemServiceImpl implements SearchItemService {
                 String location = params.getPosition().getLatitude() + ", " + params.getPosition().getLongitude();
                 if (location != null && !location.equals("")) {
                     searchRequest.source().sort(SortBuilders
-                            .geoDistanceSort("itemCompanyDvo.address.position", new GeoPoint(location))
+                            .geoDistanceSort("position", new GeoPoint(location))
                             .order(SortOrder.ASC)
                             .unit(DistanceUnit.KILOMETERS)
                     );
                 }
             }
             SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-            List<ItemSearch> homeItemList = handleResponse(response);
-            return ResponseResult.okResult(homeItemList);
+            //解析响应
+            List<CompanySearch> companySearchList = handleResponse(response);
+            return ResponseResult.okResult(companySearchList);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -89,7 +91,7 @@ public class SearchItemServiceImpl implements SearchItemService {
     //聚合标签
     public ResponseResult aggTags(String name){
         try {
-            SearchRequest searchRequest = new SearchRequest("bcyy_item");
+            SearchRequest searchRequest = new SearchRequest("bcyy_company");
             searchRequest.source().size(0);
             searchRequest.source().aggregation(AggregationBuilders
                     .terms("tags_agg")
@@ -115,7 +117,7 @@ public class SearchItemServiceImpl implements SearchItemService {
     public ResponseResult getSuggestions(String prefix) {
         try {
             // 1.准备Request
-            SearchRequest request = new SearchRequest("bcyy_item");
+            SearchRequest request = new SearchRequest("bcyy_company");
             // 2.准备DSL
             request.source().suggest(new SuggestBuilder().addSuggestion(
                     "suggestions",
@@ -143,25 +145,6 @@ public class SearchItemServiceImpl implements SearchItemService {
             throw new RuntimeException(e);
         }
     }
-    /*
-    * 查询附近
-    * */
-    public ResponseResult searchPosition(Position position) throws IOException {
-        SearchRequest searchRequest = new SearchRequest("bcyy_item");
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-
-        // 构建地理位置查询条件
-        searchSourceBuilder.query(QueryBuilders.geoDistanceQuery("itemCompanyDvo.address.position")
-                .point(position.getLatitude(), position.getLongitude())
-                .distance("15km"));
-
-        searchRequest.source(searchSourceBuilder);
-
-        // 执行查询
-        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-        List<ItemSearch> homeItemList = handleResponse(searchResponse);
-        return ResponseResult.okResult(homeItemList);
-    }
     //复合查询
     public void buildBasicQuery(RequestParams params, SearchRequest request) {
         // 1.构建BooleanQuery
@@ -175,7 +158,7 @@ public class SearchItemServiceImpl implements SearchItemService {
         }
         // 3.城市条件
         if (params.getCity() != null && !params.getCity().equals("")) {
-            boolQuery.filter(QueryBuilders.matchQuery("itemCompanyDvo.address.city", params.getCity()));
+            boolQuery.filter(QueryBuilders.matchQuery("city", params.getCity()));
         }
         // 4.标签条件
         if (params.getTags() != null && !params.getTags().equals("")) {
@@ -190,8 +173,8 @@ public class SearchItemServiceImpl implements SearchItemService {
     }
 
     //解析结果
-    public List<ItemSearch> handleResponse(SearchResponse response){
-        List<ItemSearch> list = new ArrayList<>();
+    public List<CompanySearch> handleResponse(SearchResponse response){
+        List<CompanySearch> list = new ArrayList<>();
         //解析响应
         SearchHits hits = response.getHits();
         //总条数
@@ -200,30 +183,30 @@ public class SearchItemServiceImpl implements SearchItemService {
         SearchHit[] hits1 = hits.getHits();
         for (SearchHit hit:hits1) {
             String sourceAsString = hit.getSourceAsString();
-            ItemSearch itemSearch = JSON.parseObject(sourceAsString, ItemSearch.class);
+            CompanySearch companySearch = JSON.parseObject(sourceAsString, CompanySearch.class);
             Object[] sortValues = hit.getSortValues();
             if (sortValues.length > 0) {
                 Object sortValue = sortValues[0];
-                itemSearch.setDistance(sortValue+"千米");
+                companySearch.setDistance(sortValue+"千米");
             }
-            list.add(itemSearch);
+            list.add(companySearch);
         }
         return list;
     }
     //添加文档
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(value = "item.insert.queue"),
-            exchange = @Exchange(value = "item.topic"),
-            key = "item.insert"
+            value = @Queue(value = "company.insert.queue"),
+            exchange = @Exchange(value = "company.topic"),
+            key = "company.insert"
     ))
-    public void add(HomeItem homeItem){
+    public void add(CompanyDvo companyDvo){
         BulkRequest bulkRequest = new BulkRequest();
         // 2.转换为文档类型
-        ItemSearch itemSearch = new ItemSearch(homeItem);
+        CompanySearch companySearch = new CompanySearch(companyDvo);
         // 3.将HotelDoc转json
-        String json = JSON.toJSONString(itemSearch);
+        String json = JSON.toJSONString(companySearch);
         // 1.准备Request对象
-        IndexRequest request = new IndexRequest("bcyy_item").id(itemSearch.getId());
+        IndexRequest request = new IndexRequest("bcyy_company").id(companySearch.getId());
         // 2.准备Json文档
         request.source(json, XContentType.JSON);
         bulkRequest.add(request);
@@ -233,18 +216,22 @@ public class SearchItemServiceImpl implements SearchItemService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+//        return ResponseResult.okResult(200,"添加成功");
     }
     //添加所有文档
 //    public ResponseResult addList(){
-//        List<HomeItem> homeItemList = searchItemMapper.selectList(
-//                new QueryWrapper<HomeItem>().eq("state",1));
+//        List<HomeCompany> homeCompanyList = searchCompanyMapper.selectList(
+//                new QueryWrapper<HomeCompany>().eq("state",1));
 //        BulkRequest bulkRequest = new BulkRequest();
 //        // 2.转换为文档类型
-//        for (HomeItem homeItem :homeItemList) {
-//            ItemSearch itemSearch = new ItemSearch(homeItem);
-//            bulkRequest.add(new IndexRequest("bcyy_item")
-//                    .id(itemSearch.getId())
-//                    .source(JSON.toJSONString(itemSearch),XContentType.JSON));
+//        for (HomeCompany homeCompany :homeCompanyList) {
+//            Object data = detailCompanyApi.getDeatils(homeCompany.getId()).getData();
+//            String s = JSON.toJSONString(data);
+//            CompanyDvo companyDvo = JSON.parseObject(s, CompanyDvo.class);
+//            CompanySearch companySearch = new CompanySearch(companyDvo);
+//            bulkRequest.add(new IndexRequest("bcyy_company")
+//                    .id(companySearch.getId())
+//                    .source(JSON.toJSONString(companySearch),XContentType.JSON));
 //        }
 //        // 3.发送请求
 //        try {
@@ -258,13 +245,13 @@ public class SearchItemServiceImpl implements SearchItemService {
 
     //删除文档
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(value = "item.delete.queue"),
-            exchange = @Exchange(value = "item.topic"),
-            key = "item.delete"
+            value = @Queue(value = "company.delete.queue"),
+            exchange = @Exchange(value = "company.topic"),
+            key = "company.delete"
     ))
     public void delete(String id){
         // 1.准备Request
-        DeleteRequest request = new DeleteRequest("bcyy_item", id);
+        DeleteRequest request = new DeleteRequest("bcyy_company", id);
         // 2.发送请求
         try {
             client.delete(request, RequestOptions.DEFAULT);
@@ -273,5 +260,4 @@ public class SearchItemServiceImpl implements SearchItemService {
         }
 //        return ResponseResult.okResult(200,"删除成功");
     }
-
 }

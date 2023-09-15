@@ -2,9 +2,10 @@ package com.bcyy.search;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.bcyy.apis.item.DetailsItemApi;
+import com.bcyy.model.item.dtos.HomeItemDto;
 import com.bcyy.model.item.pojos.HomeItem;
 import com.bcyy.model.search.vos.ItemSearch;
-import com.bcyy.search.mapper.SearchItemMapper;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
@@ -23,7 +24,7 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 public class ItemSearchTest {
     @Autowired
-    SearchItemMapper searchItemMapper;
+    DetailsItemApi detailsItemApi;
 
     @Autowired
     private RestHighLevelClient client;
@@ -34,16 +35,15 @@ public class ItemSearchTest {
     @Test
     public void testAddDocument() throws IOException {
 
-        List<HomeItem> homeItemList = searchItemMapper.selectList(
-                new QueryWrapper<HomeItem>().eq("state",1));
+        Object data = detailsItemApi.getItem("280aed7d-2f69-411b-a51b-88465733ab33").getData();
+        String s = JSON.toJSONString(data);
+        HomeItem homeItem = JSON.parseObject(s, HomeItem.class);
         BulkRequest bulkRequest = new BulkRequest();
         // 2.转换为文档类型
-        for (HomeItem homeItem :homeItemList) {
-            ItemSearch itemSearch = new ItemSearch(homeItem);
-            bulkRequest.add(new IndexRequest("bcyy_item")
-                    .id(itemSearch.getId())
-                    .source(JSON.toJSONString(itemSearch),XContentType.JSON));
-        }
+        ItemSearch itemSearch = new ItemSearch(homeItem);
+        bulkRequest.add(new IndexRequest("bcyy_item")
+                .id(itemSearch.getId())
+                .source(JSON.toJSONString(itemSearch),XContentType.JSON));
         // 3.发送请求
         client.bulk(bulkRequest, RequestOptions.DEFAULT);
     }
