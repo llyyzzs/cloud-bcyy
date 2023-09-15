@@ -7,5 +7,5 @@ public class MyChat {
     private String roomId;
     private String itemId;
     private String name;
-    private String avatar;
+    private String hrId;
 }

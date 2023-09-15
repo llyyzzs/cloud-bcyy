@@ -114,20 +114,18 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>imple
             key = "addCommunicate"
     ))
     public void addCommunicate(WeChat weChat){
-//        String openid = AppThreadLocalUtil.getUser().getOpenid();
-        String myAvatar = wxUserService.getUser(weChat.getOpenid()).getAvatar();
-        String hrAvatar = wxUserService.getUser(weChat.getHrId()).getAvatar();
+
         Collect collect = collectMapper.selectOne(new QueryWrapper<Collect>().eq("openid",weChat.getOpenid()));
         Collect collectHR = collectMapper.selectOne(new QueryWrapper<Collect>().eq("openid", weChat.getHrId()));
         MyChat myChat = new MyChat();
         myChat.setItemId(weChat.getItemId());
         myChat.setRoomId(weChat.getRoomId());
         myChat.setName(weChat.getName());
-        myChat.setAvatar(hrAvatar);
+        myChat.setHrId(weChat.getHrId());
         //分别为HR和应聘者添加聊天室
         HashSet<String> communicate = collect.getCommunicate();
         communicate.add(JSON.toJSONString(myChat));
-        myChat.setAvatar(myAvatar);
+        myChat.setHrId(weChat.getOpenid());
         collectHR.getCommunicate().add(JSON.toJSONString(myChat));
         collect.setCommunicate(communicate);
         collectHR.setCommunicate(collectHR.getCommunicate());
@@ -230,7 +228,7 @@ public class CollectServiceImpl extends ServiceImpl<CollectMapper, Collect>imple
         HashMap<String,Integer> list = collect.getDeliver();
         HashSet<Object> objects = new HashSet<>();
         for (String itemId:list.keySet()) {
-            Object data = detailsItemApi.getDetails(itemId).getData();
+            Object data = detailsItemApi.getItem(itemId).getData();
             HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put("item",data);
             hashMap.put("status",list.get(itemId));

@@ -7,6 +7,7 @@ import com.bcyy.apis.item.DetailsItemApi;
 import com.bcyy.apis.user.WxUserApi;
 import com.bcyy.chat.mapper.ChatRoomMapper;
 import com.bcyy.chat.service.ChatRoomService;
+import com.bcyy.common.redis.CacheService;
 import com.bcyy.model.chat.dto.DeleteRoom;
 import com.bcyy.model.chat.dto.UpRoom;
 import com.bcyy.model.chat.dvo.RoomDvo;
@@ -46,6 +47,8 @@ public class ChatRoomServiceImpl extends ServiceImpl<ChatRoomMapper, ChatRoom> i
     DetailsItemApi detailsItemApi;
     @Autowired
     RabbitTemplate rabbitTemplate;
+    @Autowired
+    CacheService cacheService;
     /**
      * 添加聊天室
      * */
@@ -124,7 +127,10 @@ public class ChatRoomServiceImpl extends ServiceImpl<ChatRoomMapper, ChatRoom> i
             RoomDvo roomDvo = new RoomDvo();
             BeanUtils.copyProperties(chatRoom,roomDvo);
             roomDvo.setName(myChat.getName());
-            roomDvo.setAvatar(myChat.getAvatar());
+            String s = cacheService.get("images::" + myChat.getHrId());
+            if (s != null) {
+                roomDvo.setAvatar(s);
+            }
             roomList.add(roomDvo);
         }
         return ResponseResult.okResult(roomList);
