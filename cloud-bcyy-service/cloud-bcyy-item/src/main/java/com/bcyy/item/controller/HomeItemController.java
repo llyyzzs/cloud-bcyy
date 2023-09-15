@@ -10,10 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,13 +23,17 @@ public class HomeItemController {
     @PostMapping("/get/home")
     @ApiOperation("获取首页内容")
     public ResponseResult homeItem(@RequestBody HomeItemDto homeItemDto){
-        return homeItemService.homeItem(homeItemDto,0);
+        return homeItemService.homeItem(homeItemDto,1);
     }
-
+    @GetMapping("/get/itemOne")
+    @ApiOperation("获取单个招聘简略信息")
+    public ResponseResult getItem(@RequestParam("itemId") String itemId){
+        return homeItemService.getItem(itemId);
+    }
     @PostMapping("/get/companyItem")
     @ApiOperation("获取公司岗位")
     public ResponseResult getCompanyItem(@RequestBody CompanyItemDto companyItemDto){
-        return homeItemService.getCompanyItem(companyItemDto,0);
+        return homeItemService.getCompanyItem(companyItemDto,1);
     }
     @PostMapping("/get/screen")
     @ApiOperation("筛选查询")

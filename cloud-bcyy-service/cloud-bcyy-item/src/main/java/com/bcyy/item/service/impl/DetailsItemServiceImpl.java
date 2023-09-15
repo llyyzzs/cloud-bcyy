@@ -1,10 +1,10 @@
 package com.bcyy.item.service.impl;
 
+
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bcyy.apis.company.DetailCompanyApi;
-import com.bcyy.apis.search.SearchItem;
 import com.bcyy.apis.user.WxUserApi;
 import com.bcyy.common.redis.CacheService;
 import com.bcyy.item.mapper.DetailsItemMapper;
@@ -21,10 +21,6 @@ import com.bcyy.model.user.pojos.WxUser;
 import com.bcyy.utils.thread.AppThreadLocalUtil;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.annotation.Exchange;
-import org.springframework.amqp.rabbit.annotation.Queue;
-import org.springframework.amqp.rabbit.annotation.QueueBinding;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +107,7 @@ public class DetailsItemServiceImpl extends ServiceImpl<DetailsItemMapper, Detai
             homeItemMapper.insert(homeItem);
             rabbitTemplate.convertAndSend("item.topic","item.insert",homeItem);
 //            searchItem.add(homeItem);
+            return ResponseResult.okResult(200,"添加成功");
         }else {
             detailsItemMapper.update(detailsItem,new QueryWrapper<DetailsItem>()
                     .eq("id",addItemDto.getItemId()));
@@ -121,8 +118,8 @@ public class DetailsItemServiceImpl extends ServiceImpl<DetailsItemMapper, Detai
             rabbitTemplate.convertAndSend("item.topic","item.insert",homeItem);
 //            searchItem.delete(homeItem.getItemId());
 //            searchItem.add(homeItem);
+            return ResponseResult.okResult(200,"修改成功");
         }
-        return ResponseResult.okResult(200,"添加成功");
     }
     /*
     * 修改招聘状态*/

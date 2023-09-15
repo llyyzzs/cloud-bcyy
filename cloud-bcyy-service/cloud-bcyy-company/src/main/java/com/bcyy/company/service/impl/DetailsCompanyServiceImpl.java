@@ -102,7 +102,10 @@ public class DetailsCompanyServiceImpl extends ServiceImpl<DetailsCompanyMapper,
             UserUp userUp = new UserUp();
             BeanUtils.copyProperties(user,userUp);
 //            rabbitTemplate.convertAndSend("bcyy_company","upUser",userUp);
-            rabbitTemplate.convertAndSend("company.topic","company.insert",homeCompany);
+            CompanyDvo companyDvo = new CompanyDvo();
+            BeanUtils.copyProperties(homeCompany,companyDvo);
+            BeanUtils.copyProperties(detailsCompany,companyDvo);
+            rabbitTemplate.convertAndSend("company.topic","company.insert",companyDvo);
             wxUserApi.update(userUp);
         }else {
             homeCompany.setId(companyDto.getCompanyId());
@@ -148,9 +151,7 @@ public class DetailsCompanyServiceImpl extends ServiceImpl<DetailsCompanyMapper,
             return ResponseResult.errorResult(401,"文件上传失败");
         }
         else {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("fileUrl",fileUrl);
-            return ResponseResult.okResult(map);
+            return ResponseResult.okResult(fileUrl);
         }
     }
 }

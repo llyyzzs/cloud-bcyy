@@ -42,7 +42,7 @@ public class HomeItemServiceImpl extends ServiceImpl<HomeItemMapper, HomeItem> i
     public ResponseResult homeItem(HomeItemDto homeItemDto,Integer type) {
         Page<HomeItem> page = new Page<>();
         if (homeItemDto.getPage() == null) {
-            page.setCurrent(1);
+            page.setCurrent(0);
         }else {
             page.setCurrent(homeItemDto.getPage());
         }
@@ -91,7 +91,11 @@ public class HomeItemServiceImpl extends ServiceImpl<HomeItemMapper, HomeItem> i
             queryWrapper.like(HomeItem::getItemCompanyDvo,"\"id\": \"" +companyItemDto.getCompanyId()  + "\"");
         }
         Page<HomeItem> homeItemPage = homeItemMapper.selectPage(page, queryWrapper);
-        return ResponseResult.okResult(homeItemPage);
+        return ResponseResult.okResult(homeItemPage.getRecords());
+    }
+    public ResponseResult getItem(String id){
+        HomeItem homeItem = homeItemMapper.selectOne(new QueryWrapper<HomeItem>().eq("id",id));
+        return ResponseResult.okResult(homeItem);
     }
     /**
      * 筛选岗位

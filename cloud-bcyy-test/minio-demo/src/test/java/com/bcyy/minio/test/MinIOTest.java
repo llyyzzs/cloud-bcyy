@@ -4,6 +4,7 @@ import com.bcyy.file.service.FileStorageService;
 import com.bcyy.minio.MinIOApplication;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class MinIOTest {
             fileInputStream =  new FileInputStream("D:\\图片\\联想锁屏壁纸\\BingWallpaper-2022-08-21.jpg");;
 
             //1.创建minio链接客户端
-            MinioClient minioClient = MinioClient.builder().credentials("minioadmin", "minioadmin").endpoint("http://192.168.11.129:9000").build();
+            MinioClient minioClient = MinioClient.builder().credentials("minioadmin", "minioadmin").endpoint("http://192.168.11.111:9000").build();
             //2.上传
             PutObjectArgs putObjectArgs = PutObjectArgs.builder()
                     .object("test3.png")//文件名
@@ -41,16 +42,16 @@ public class MinIOTest {
     @Autowired
     private FileStorageService fileStorageService;
 
-    @Test
-    public void testUpdateImgFile() {
-        try {
-//            FileInputStream fileInputStream = new FileInputStream("D:\\图片\\联想锁屏壁纸\\BingWallpaper-2022-08-21.jpg");
-//            String filePath = fileStorageService.uploadImgFile("", "test11.png", fileInputStream);
-            fileStorageService.delete("http://192.168.11.129:9000/bcyy/2023/08/15/fc699793ca12441ea84a4cc17e1cd44f.jpg");
-//            System.out.println(filePath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    @Test
+//    public void testUpdateImgFile() {
+//        try {
+////            FileInputStream fileInputStream = new FileInputStream("D:\\图片\\联想锁屏壁纸\\BingWallpaper-2022-08-21.jpg");
+////            String filePath = fileStorageService.uploadImgFile("", "test11.png", fileInputStream);
+//            fileStorageService.delete("http://192.168.11.111:9000/bcyy/2023/08/15/fc699793ca12441ea84a4cc17e1cd44f.jpg");
+////            System.out.println(filePath);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 }
