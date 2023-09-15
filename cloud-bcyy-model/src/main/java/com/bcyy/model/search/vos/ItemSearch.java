@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ItemSearch {
     private String  id;
+    private String hrId;
     private String name;
     private String price;
     private String tags;
@@ -29,6 +30,7 @@ public class ItemSearch {
     //建议
     private List<String> suggestion;
     public ItemSearch(HomeItem homeItem){
+        this.hrId=homeItem.getHrId();
         this.id=homeItem.getItemId();
         this.name=homeItem.getName();
         this.price=homeItem.getPrice();
@@ -43,7 +45,7 @@ public class ItemSearch {
         Address address = homeItem.getItemCompanyDvo().getAddress();
         Address2 address2 = new Address2();
         BeanUtils.copyProperties(address,address2);
-        address2.setPosition(address.getPosition().getLongitude()+", "+address.getPosition().getLatitude());
+        address2.setPosition(address.getPosition().getLatitude()+", "+address.getPosition().getLongitude());
         itemCompanyDvo2.setAddress(address2);
         this.itemCompanyDvo=itemCompanyDvo2;
         // 组装suggestion

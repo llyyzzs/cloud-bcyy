@@ -1,6 +1,7 @@
 package com.bcyy.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.bcyy.common.redis.CacheService;
 import com.bcyy.model.common.dtos.ResponseResult;
 import com.bcyy.model.item.dtos.Position;
 import com.bcyy.model.item.pojos.HomeItem;
@@ -51,8 +52,8 @@ import java.util.List;
 public class SearchItemServiceImpl implements SearchItemService {
     @Autowired
     RestHighLevelClient client;
-//    @Autowired
-//    SearchItemMapper searchItemMapper;
+    @Autowired
+    CacheService cacheService;
     /**
      * 搜索
      */
@@ -81,6 +82,12 @@ public class SearchItemServiceImpl implements SearchItemService {
             }
             SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
             List<ItemSearch> homeItemList = handleResponse(response);
+            for (ItemSearch homeItem:homeItemList) {
+                String s = cacheService.get("images::" + homeItem.getHrId());
+                if (s != null) {
+                    homeItem.setImage(s);
+                }
+            }
             return ResponseResult.okResult(homeItemList);
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -37,8 +37,8 @@ public class CompanySearch {
         this.salary=companyDvo.getSalary();
         this.launch=companyDvo.getLaunch();
         this.tags=companyDvo.getTags();
-        this.position=companyDvo.getAddress().getPosition().getLongitude()
-                +", "+companyDvo.getAddress().getPosition().getLatitude();
+        this.position=companyDvo.getAddress().getPosition().getLatitude()
+                +", "+companyDvo.getAddress().getPosition().getLongitude();
         this.city=companyDvo.getAddress().getCity();
         this.suggestion= Arrays.asList(this.name,this.city);
     }
