@@ -17,7 +17,7 @@ public class AppJwtUtil {
     // 最小刷新间隔(S)
     private static final int REFRESH_TIME = 300;
 
-    // 生产ID
+    // 生产id
     public static String getToken(String id){
         Map<String, Object> claimMaps = new HashMap<>();
         claimMaps.put("id",id);
