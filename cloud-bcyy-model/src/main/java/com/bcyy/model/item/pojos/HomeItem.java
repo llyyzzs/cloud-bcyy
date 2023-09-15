@@ -13,6 +13,8 @@ import java.util.List;
 public class HomeItem {
     @TableField(value = "id")
     private String itemId;
+    @TableField("hr_id")
+    private String hrId;
     private String name;
     private String price;
     @TableField(value = "itemCompanyDvo",typeHandler = JacksonTypeHandler.class)

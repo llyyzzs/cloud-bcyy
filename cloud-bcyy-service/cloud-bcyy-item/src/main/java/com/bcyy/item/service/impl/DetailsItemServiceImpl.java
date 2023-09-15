@@ -90,6 +90,7 @@ public class DetailsItemServiceImpl extends ServiceImpl<DetailsItemMapper, Detai
         homeItem.setHRname(user.getName());
         homeItem.setImage(user.getAvatar());
         detailsItem.setHrId(openid);
+        homeItem.setHrId(openid);
         //将公司信息添加到招聘信息中
         Object data1 = detailCompanyApi.getDeatils(user.getCompanyId()).getData();
         String s1 = JSON.toJSONString(data1);
@@ -116,8 +117,6 @@ public class DetailsItemServiceImpl extends ServiceImpl<DetailsItemMapper, Detai
             cacheService.delete("DetailItem_" + addItemDto.getItemId());
             rabbitTemplate.convertAndSend("item.topic","item.delete",homeItem.getItemId());
             rabbitTemplate.convertAndSend("item.topic","item.insert",homeItem);
-//            searchItem.delete(homeItem.getItemId());
-//            searchItem.add(homeItem);
             return ResponseResult.okResult(200,"修改成功");
         }
     }

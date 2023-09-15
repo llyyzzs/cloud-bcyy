@@ -1,9 +1,12 @@
 package com.bcyy.item.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.bcyy.apis.user.WxUserApi;
+import com.bcyy.common.redis.CacheService;
 import com.bcyy.item.mapper.DetailsItemMapper;
 import com.bcyy.item.mapper.HomeItemMapper;
 import com.bcyy.item.service.HomeItemService;
@@ -14,6 +17,7 @@ import com.bcyy.model.item.dtos.ScreenDto;
 import com.bcyy.model.item.pojos.DetailsItem;
 import com.bcyy.model.item.pojos.HomeItem;
 import com.bcyy.model.item.vos.ItemDvo;
+import com.bcyy.model.user.pojos.WxUser;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -34,6 +38,10 @@ public class HomeItemServiceImpl extends ServiceImpl<HomeItemMapper, HomeItem> i
     HomeItemMapper homeItemMapper;
     @Autowired
     DetailsItemMapper detailsItemMapper;
+    @Autowired
+    WxUserApi wxUserApi;
+    @Autowired
+    CacheService cacheService;
     /**
      * 获取岗位列表
      * @return
@@ -62,7 +70,14 @@ public class HomeItemServiceImpl extends ServiceImpl<HomeItemMapper, HomeItem> i
         }
         queryWrapper.eq("state",1);
         Page<HomeItem> homeItemPage = homeItemMapper.selectPage(page, queryWrapper);
-        return ResponseResult.okResult(homeItemPage.getRecords());
+        List<HomeItem> records = homeItemPage.getRecords();
+        for (HomeItem homeItem:records) {
+            String s = cacheService.get("images::" + homeItem.getHrId());
+            if (s != null) {
+                homeItem.setImage(s);
+            }
+        }
+        return ResponseResult.okResult(records);
     }
     /**
      * 获取某个公司的岗位列表
@@ -91,10 +106,21 @@ public class HomeItemServiceImpl extends ServiceImpl<HomeItemMapper, HomeItem> i
             queryWrapper.like(HomeItem::getItemCompanyDvo,"\"id\": \"" +companyItemDto.getCompanyId()  + "\"");
         }
         Page<HomeItem> homeItemPage = homeItemMapper.selectPage(page, queryWrapper);
-        return ResponseResult.okResult(homeItemPage.getRecords());
+        List<HomeItem> records = homeItemPage.getRecords();
+        for (HomeItem homeItem:records) {
+            String s = cacheService.get("images::" + homeItem.getHrId());
+            if (s != null) {
+                homeItem.setImage(s);
+            }
+        }
+        return ResponseResult.okResult(records);
     }
     public ResponseResult getItem(String id){
         HomeItem homeItem = homeItemMapper.selectOne(new QueryWrapper<HomeItem>().eq("id",id));
+        String s = cacheService.get("images::" + homeItem.getHrId());
+        if (s != null) {
+            homeItem.setImage(s);
+        }
         return ResponseResult.okResult(homeItem);
     }
     /**
