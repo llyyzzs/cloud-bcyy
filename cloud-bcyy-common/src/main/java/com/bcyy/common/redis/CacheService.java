@@ -23,7 +23,7 @@ public class CacheService extends CachingConfigurerSupport {
         return this.stringRedisTemplate;
     }
 
-    /** -------------------key相关操作--------------------- */
+    /** -------------------key相关操作-------------------- */
 
     /**
      * 删除key
