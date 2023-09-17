@@ -94,9 +94,10 @@ public class SearchItemServiceImpl implements SearchItemService {
         }
     }
     //聚合标签
-    public ResponseResult aggTags(String name){
+    public ResponseResult aggTags(String name,Integer type){
         try {
             SearchRequest searchRequest = new SearchRequest("bcyy_item");
+            searchRequest.source().query(QueryBuilders.termQuery("type",type));
             searchRequest.source().size(0);
             searchRequest.source().aggregation(AggregationBuilders
                     .terms("tags_agg")

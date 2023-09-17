@@ -24,8 +24,8 @@ public class SearchItemController {
     }
     @GetMapping("/aggs")
     @ApiOperation("检索标签")
-    public ResponseResult aggs(String name){
-        return searchItemService.aggTags(name);
+    public ResponseResult aggs(String name,Integer type){
+        return searchItemService.aggTags(name,type);
     }
     @ApiOperation("搜索建议")
     @GetMapping("suggestion")

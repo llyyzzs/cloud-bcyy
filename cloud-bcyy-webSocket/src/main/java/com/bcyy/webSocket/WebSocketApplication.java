@@ -8,8 +8,8 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableWebSocket
-public class WenSocketApplication {
+public class WebSocketApplication {
     public static void main(String[] args) {
-        SpringApplication.run(WenSocketApplication.class,args);
+        SpringApplication.run(WebSocketApplication.class,args);
     }
 }
