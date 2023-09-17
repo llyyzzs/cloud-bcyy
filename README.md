@@ -8,19 +8,19 @@
 
 三大主页
 
-![](https://gitee.com/lyzssssss/wechat-mini-program/raw/master/%E4%B8%89%E5%A4%A7%E4%B8%BB%E9%A1%B5.jpg)
+![](https://gitee.com/lyzssssss/wechat-mini-program/blob/master/3.jpg)
 
 个人端
 
-![](https://gitee.com/lyzssssss/wechat-mini-program/blob/master/%E4%B8%AA%E4%BA%BA%E7%AB%AF.jpg)
+![](https://gitee.com/lyzssssss/wechat-mini-program/blob/master/my.jpg)
 
 招聘端
 
-![](https://gitee.com/lyzssssss/wechat-mini-program/blob/master/%E6%8B%9B%E8%81%98%E7%AB%AF.jpg)
+![](https://gitee.com/lyzssssss/wechat-mini-program/blob/master/item.jpg)
 
 聊天端
 
-![](https://gitee.com/lyzssssss/wechat-mini-program/blob/master/%E8%81%8A%E5%A4%A9%E7%AB%AF.jpg)
+![](https://gitee.com/lyzssssss/wechat-mini-program/blob/master/chat.jpg)
 
 ## 项目使用的技术栈
 
