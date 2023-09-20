@@ -115,7 +115,7 @@ Error downloading packages:
 
 那么是docker-engine-17.05.0.ce-1.el7.centos.x86_64这个rpm包下载不下来，到http://mirrors.aliyun.com/docker-engine/yum/repo/main/centos/7/Packages/ 仓库看了下，发现阿里云根本就没有这个包。
 
-所以旧智能手动下载，手动安装了
+手动安装
 
 ```
 wget http://mirrors.aliyun.com/docker-engine/yum/repo/main/centos/7/Packages/docker-engine-17.03.0.ce-1.el7.centos.x86_64.rpm
