@@ -8,19 +8,19 @@
 
 三大主页
 
-![](https://gitee.com/lyzssssss/wechat-mini-program/raw/master/3.jpg)
+![](https://raw.githubusercontent.com/llyyzzs/picture/master/booszp/home.jpg)
 
 个人端
 
-![](https://gitee.com/lyzssssss/wechat-mini-program/raw/master/my.jpg)
+![](https://raw.githubusercontent.com/llyyzzs/picture/master/booszp/user.jpg)
 
 招聘端
 
-![](https://gitee.com/lyzssssss/wechat-mini-program/raw/master/item.jpg)
+![](https://raw.githubusercontent.com/llyyzzs/picture/master/booszp/item.jpg)
 
 聊天端
 
-![](https://gitee.com/lyzssssss/wechat-mini-program/raw/master/chat.jpg)
+![](https://raw.githubusercontent.com/llyyzzs/picture/master/booszp/chat.jpg)
 
 ## 项目使用的技术栈
 
