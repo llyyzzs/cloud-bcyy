@@ -177,7 +177,7 @@ docker pull xuxueli/xxl-job-admin:2.3.0
 docker pull seataio/seata-server:1.4.2
 docker pull elasticsearch:7.12.1
 docker pull kibana:7.12.1
-docker pull kibana:7.12.1
+docker pull rabbitmq:management
 ```
 
 
